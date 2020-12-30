@@ -1,0 +1,63 @@
+%Coordinate to index
+d=6;
+L=[4,8,5,9,6,7];%L=[L1,L2,L3,L4,L5,L6];
+data1=importdata('input_coordinates_7_2.txt');
+x=data1.data; 
+A=size(x);
+I=x(:,1);
+
+%To store the value L1*L2...*L_(d-1);
+NewL=zeros(1,d-1);
+NewL(1)=L(1);
+for i=2:d-1
+    NewL(i)=L(i)*NewL(i-1);
+end
+    
+for i=2:d
+I=I+x(:,i)*NewL(i-1);
+end
+
+%Here I store the I vector in the 'output_index_7_2.txt'
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%index to coordinate
+d=6;
+L=[4,8,5,9,6,7];%L=[L1,L2,L3,L4,L5,L6];
+data1=importdata('input_index_7_2.txt');
+I=data1.data; 
+A=size(I);
+x=zeros(A(1),d);%To create a matix to sotre 'x';
+
+%To store the value L1*L2...*L_(d-1);
+NewL=zeros(1,d-1);
+NewL(1)=L(1);
+for i=2:d-1
+    NewL(i)=L(i)*NewL(i-1);
+end
+
+for k=1:d-1
+for i=1:A(1)
+x(i,k)=Mymod(I(i),NewL(k));
+end
+end
+
+for i=2:d-1
+    x(:,i)=x(:,i)-x(:,1);
+    for k=2:i-1
+        x(:,i)=x(:,i)-x(:,k)*NewL(k-1);
+    end
+    x(:,i)=x(:,i)./NewL(i-1);
+end
+
+x(:,d)=I-x(:,1);
+for i=2:d-1
+   x(:,d)=x(:,d)-x(:,i).*NewL(i-1); 
+end
+x(:,d)=x(:,d)./NewL(d-1);
+%Here I store the x matrix in the 'output_index_7_2.txt'
