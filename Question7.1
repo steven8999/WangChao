@@ -11,6 +11,17 @@ else
     result=x;
 end
 
+
+%coordinate to index
+data1=importdata('input_coordinates_7_1.txt');
+data2=data1.data; 
+x1=data2(:,1);
+x2=data2(:,2);
+L=[50,57];%L=[L1,L2];
+I=x2.*L(1)+x1;
+%Here I store the I vector in the 'output_index_7_1.txt'
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %index to coordinate
 data1=importdata('input_index_7_1.txt');
 I=data1.data; 
@@ -23,11 +34,4 @@ end
 x(:,2)=(I-x(:,1))./L(1);
 %Here I store the x matrix in the 'output_index_7_1.txt'
 
-%coordinate to index
-data1=importdata('input_coordinates_7_1.txt');
-data2=data1.data; 
-x1=data2(:,1);
-x2=data2(:,2);
-L=[50,57];%L=[L1,L2];
-I=x2.*L(1)+x1;
-%Here I store the I vector in the 'output_index_7_1.txt'
+
