@@ -1,0 +1,120 @@
+function [ a3,Theta1,Theta2,CostvalueSet,apha,Error,k ] = TrainingNetwork2
+
+X=load('train_data.txt');
+%Initialization;
+y=load('train_truth.txt');
+[m, n] = size(X);
+
+Error = 1;
+tol = 1e-05;
+N = 10000;
+CostvalueSet=zeros(N,1);
+k=1;
+apha = 1e-04;
+
+label = zeros(10, m);
+for j = 1:m
+    label(y(j), j) = 1;
+end
+
+labelVec = label(:);
+
+while Error>tol&&k<=N
+    
+    %Implement fowrward propagation;
+    [ a1,a2,a3 ] = ForwardPropagation( Theta1,Theta2,X );
+    a3Vec = a3(:);
+    
+    %Implement code to compute cost function;
+    CostvalueSet(k) =-( log(a3Vec') * labelVec + log((1 - a3Vec)') * (1 - labelVec) ) / m;
+    
+    %Implement backprop to compute partial derivative;
+    [ Delta1,Delta2 ] = MyBackpropagation( Theta1,Theta2,a1,a2,a3,label );
+    
+    %Use gradient checking to compare backpropagation and  numerical estimate;
+    if k==1
+        [ ND1,ND2 ] = GradientChecking;
+        if (ND1~=(Delta1/5000))&&(ND2~=(Delta2/5000))
+            error('Failed to pass gradient checking')
+        end
+    end
+    
+    %Use gradient descent method with back propagation.
+    Theta11=Theta1-apha.*Delta1;
+    Theta22=Theta2-apha.*Delta2;
+    
+    error1 = max(max(abs(Theta11 - Theta1)));
+    error2 = max(max(abs(Theta22 - Theta2)));
+    Error = max(error1, error2);
+    
+    Theta1=Theta11;
+    Theta2=Theta22;
+    
+    k=k+1;
+end
+end
+
+function [ Costvalue ] = CostValue(h)
+%Compute the cost value;
+X=load('train_data.txt');
+feature = X;
+
+Costvalue=0;
+
+%Compute the cost function.
+[K,M]=size(h);
+Y=zeros(K,M);
+
+%Create a matrix. For example, y=5, Y=[0 0 0 0 1 0 0 .....]
+for p=1:100
+    Y(y(p),p)=1;
+end
+%Use the formula to compute the Costvalue
+for i=1:M
+    for j=1:K 
+        Costvalue=Costvalue+Y(j,i).*log(h(j,i))+(1-Y(j,i)).*log(1-h(j,i));
+    end
+end
+Costvalue=-Costvalue./M;
+
+end
+
+function [ x,NewHiddenLayer,h ] = ForwardPropagation( Theta1,Theta2,feature )
+%Implement the forward propagation for the neural network to pedict
+%the labels of the training set.
+
+feature = feature';
+%Add x=1 to the feature;
+[m,n] = size(feature);
+x = ones(m+1,n);
+x(2:(m+1),1:n) = feature;
+
+hidden = 1./(1+exp(-Theta1*x));
+
+%Then add 1 to the hidden layer.
+[z,~] = size(Theta1);
+NewHiddenLayer = ones(z + 1,n);
+NewHiddenLayer(2:(z + 1),1:n) = hidden;
+
+h = 1./(1 + exp(-Theta2*NewHiddenLayer));
+
+end
+
+
+function [ Delta1,Delta2 ] = MyBackpropagation( Theta1,Theta2,a1,a2,a3,label_rand )
+
+delta3 = a3 - label_rand;
+Delta2 = delta3 * a2';
+
+%perform back propagation to compute all previous layer error vetor;
+delta2 = Theta2' * delta3 .* (a2 .* (1 - a2));
+
+%Compute the △;
+%size(Delta1)=25*401,the unit of Layer 2 is 26;
+delta2(1,:)=[];
+Delta1 = delta2 * a1';
+
+Delta1=Delta1;
+Delta2=Delta2;
+
+end
