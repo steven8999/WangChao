@@ -1,0 +1,42 @@
+%Given a sequence of points that form a polygon.
+%The point is in 2 dimensions.
+%Here I use library functions and explain how it work.
+data1=load('input_question_6_polygon');
+A=size(data1);
+x=data1(:,1);
+y=data1(:,2);
+K1 = convhull(x,y);
+
+%The index of the convex hull is arranged counterclockwise.
+%Draw the data and its convex hull.
+plot(x,y,'.','markersize',12)
+xlabel('Longitude')
+ylabel('Latitude')
+hold on
+plot(x(K1),y(K1),'r')
+
+%I add the tested point in TestM, if convhull form a new polygon, then the
+%test point is not in the original polygon.
+TestM=zeros(A(1)+1,2);
+TestM(1:A(1),:)=data1;
+data2=load('input_question_6_points');
+B=size(data2);
+Record1=zeros(B(1),1);
+
+for i=1:B(1)
+    TestM(A(1)+1,:)=data2(i,:);
+    K2 = convhull(TestM(:,1),TestM(:,2));
+    %1:Inside; 2:Outside
+    if size(K1)==size(K2)
+        if K1==K2
+            Record1(i)=1;
+        else
+            Record1(i)=2;
+        end
+    else
+        Record1(i)=2;
+    end
+end
+
+Record1
+%Here I record Record1 in 'output_question_6.txt'.
