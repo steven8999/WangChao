@@ -1,0 +1,33 @@
+function [ result ] = Mymod( x,y )
+%My mod code, here I do not consider y=0, since L_i~=0;
+%x and y is a real number instead of matrices;
+if x>=y
+middle=x-y;
+while y<=middle
+    middle=middle-y;
+end
+result=middle;
+else
+    result=x;
+end
+
+%index to coordinate
+data1=importdata('input_index_7_1.txt');
+I=data1.data; 
+A=size(I);
+x=zeros(A(1),2);%To create a matix to sotre 'x';
+L=[50,57];%L=[L1,L2];
+for i=1:A(1)
+x(i,1)=Mymod(I(i),L(1));
+end
+x(:,2)=(I-x(:,1))./L(1);
+%Here I store the x matrix in the 'output_index_7_1.txt'
+
+%coordinate to index
+data1=importdata('input_coordinates_7_1.txt');
+data2=data1.data; 
+x1=data2(:,1);
+x2=data2(:,2);
+L=[50,57];%L=[L1,L2];
+I=x2.*L(1)+x1;
+%Here I store the I vector in the 'output_index_7_1.txt'
