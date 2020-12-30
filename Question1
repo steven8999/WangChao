@@ -1,3 +1,4 @@
+%The code runs in Matlab.
 Store=[65 72 90 110];
 for l=1:4
     Sumnumber=Store(l);
