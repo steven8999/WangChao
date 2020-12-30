@@ -1,0 +1,81 @@
+Store=[65 72 90 110];
+for l=1:4
+    Sumnumber=Store(l);
+    m=9;%row
+    n=9;%column
+    Matrix1=ones(m,n);%Create an identity matrix;
+    Permutation=factorial(m+n-2)./(factorial(m-1)*factorial(n-1));
+    Value=zeros(m*n,Permutation);
+    PermutationM=zeros(m.*n ,2);%In order to store the number of value from up and left.
+    OperationStore=zeros((m+n-2),1);
+    
+    %In order to create the desirable matrix.
+    for i=2:m
+        Matrix1(i,:)=Matrix1(i,:)+Matrix1(i-1,:);
+    end
+    
+    %Initialization the value.
+    Value(1,1)=1;
+    for i=2:n
+        Value(i,1)=Matrix1(1,i)+Value(i-1,1);
+    end
+    for i=2:m
+        Value((i-1)*n+1)=Matrix1(i,1)+Value((i-2)*n+1);
+    end
+    
+    %Initialization the PermutationM.
+    PermutationM(1,:)=[0,0];
+    for j=2:n
+        PermutationM(j,:)=[0,1];
+    end
+    for k=2:m
+        PermutationM((k-1)*n+1,:)=[1,0];
+    end
+    
+    %Here, I use the dynamic programming to update the result of 'Value'.
+    for j=2:m
+        for k=2:n
+            Permutation2 = sum( Value((j-2)*n+k,:)~=0 );
+            Permutation3= sum( Value((j-1)*n+k-1,:)~=0 );
+            Value((j-1)*n+k,1:Permutation2)=Matrix1(j,k)+Value((j-2)*n+k,1:Permutation2);%
+            Value((j-1)*n+k,Permutation2+1:Permutation2+Permutation3)=Matrix1(j,k)+Value((j-1)*n+k-1,1:Permutation3);
+            %Store the number of value, in order to recover the operations.
+            PermutationM((j-1)*n+k,:)=[Permutation2 Permutation3];
+        end
+    end
+    
+    %Recover the operation.
+    %Since it may be many same summed number, here I use the first appeared
+    %summed number, which I want.
+    Location1=find(Value(81,:)==Sumnumber);
+    Location1=Location1(1);
+    %Here use 1 to represent the operation D and 2 to represent the operation R.
+    %The first operation according to the after all operations, then only m+n-3
+    %here.
+    j=m;
+    k=n;
+    middle=Sumnumber;%the middle value;
+    for i=1:(m+n-3)
+        if Location1<=PermutationM((j-1)*n+k,1)
+            OperationStore(m+n-1-i)=1;
+            middle=middle-Matrix1(j,k);
+            j=j-1;%Down
+        else
+            OperationStore(m+n-1-i)=2;
+            middle=middle-Matrix1(j,k);
+            k=k-1;%Right
+        end
+        Location1=find(Value((j-1)*n+k,:)==middle);
+        Location1=Location1(1);
+    end
+    %Recover the first operation.
+    if size(find(OperationStore==1))==(m-1)
+        OperationStore(1)=2;%Right
+    else
+        OperationStore(1)=1;%Down
+    end
+    
+    OperationStore=OperationStore';
+    OperationStore
+    
+end
