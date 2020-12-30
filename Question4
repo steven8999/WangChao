@@ -1,0 +1,49 @@
+%Here we use Two Pass method to implemrnt 4-connectivity connected components.
+%B is the output matrix.
+M=load('input_question_4');
+[m n]=size(M);
+B=zeros(m,n);
+%The first pass
+label=0;
+for j=1:n
+    for i=1:m
+        if M(i,j)==1
+            scanset=Neighbour( M,i,j );
+            if B(scanset)==0
+                label=label+1;
+                B(i,j)=label;
+            elseif max(B(scanset))>=1
+                %if there are pixels with pixel value>1 in the field;
+                B(i,j)=max(B(scanset));
+            end
+        end
+    end
+end
+
+%The second pass
+label=1;
+for j=1:n
+    for i=1:m
+        if B(i,j)~=0
+            scanset=Neighbour( M,i,j );
+            location=scanset(find(B(scanset)~=0));
+            minV=min(min(B(location),B(i,j)));
+            B(location)=minV;
+        end
+    end
+end
+
+
+%Here we let the label be 1,2,3.... instead of 1,3,8,...
+label=2;
+for i=2:(m*n)
+    
+    A=find(B==i);
+    if min(size(A))~=0
+       B(A)=label;
+       label=label+1; 
+    end
+end
+
+B
+%Here, I store the matrix B in 'output_question_4.'
